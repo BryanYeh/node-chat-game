@@ -1,6 +1,8 @@
 {
-  "name": "socket-chat-example",
+  "name": "node-chat-game",
   "version": "0.0.1",
-  "description": "my first socket.io app",
-  "dependencies": {}
+  "description": "A Node JS chat game",
+  "dependencies": {
+    "express": "^4.13.4"
+  }
 }
