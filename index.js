@@ -2,7 +2,9 @@ var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-app.use(express.static('css')); 
+var PORT = process.env.PORT || '3000';
+// var IP = process.env.IP;
+app.use(express.static(__dirname)); 
 // app.use('/static',express.static(__dirname + 'css'));
 
 app.get('/', function(req, res){
@@ -23,6 +25,6 @@ io.on('connection', function(socket){
   });
 });
 
-http.listen(3000, function(){
+http.listen(PORT, function(){
   console.log('listening on *:3000');
 });

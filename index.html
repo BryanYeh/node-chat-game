@@ -3,7 +3,7 @@
 
 <head>
     <title>Socket.IO chat</title>
-    <link rel="stylesheet" href="/css/custom.css">
+    <link rel="stylesheet" href="css/custom.css">
 </head>
 
 <body>
@@ -11,8 +11,8 @@
     <form action="">
         <input id="m" autocomplete="off" /><button>Send</button>
     </form>
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+    <script src="node_modules/socket.io/node_modules/socket.io-client/socket.io.js"></script>
+    <script src="node_modules/jquery/dist/jquery.min.js"></script>
     <script>
     var socket = io();
 $('form').submit(function () {
@@ -24,7 +24,7 @@ socket.on('chat message', function (msg) {
     $('#messages').append($('<li>').text(msg));
 });
 </script>
-    <script src="/js/custom.js"></script>
+    <script src="js/custom.js"></script>
 </body>
 
 </html>
