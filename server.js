@@ -13,37 +13,47 @@ app.get('/', function(req, res) {
     res.sendFile(__dirname + '/index.html');
 });
 
-var onlineGamers = new ArrayList();
+var onlineGamers = {};
 var privateGame = new ArrayList();
 
 io.on('connection', function(socket) {
+
     // user login
     socket.on('login', function(username) {
-        //length of username have to be 5+
         if (username.length >= 5) {
-            //check if username exists
-            if (onlineGamers.indexOf(username) > -1) {
-                socket.emit("username exists");
+            if (onlineGamers[username]) {
+                socket.emit("usernameError","Username (" + username + ") is already in use");
             } else {
                 socket.join("default");
-                onlineGamers.push(username);
+                onlineGamers[username] = socket.id;
                 socket.username = username;
-                socket.onlineId = onlineGamers.indexOf(username);
-                socket.emit("login successful");
+                socket.currentRoom = "default";
+                socket.emit("login successful", "Your username is: " + username);
+                io.emit("users",Object.keys(onlineGamers));
             }
+        }
+        else{
+            socket.emit("usernameError","username needs at least 5 characters");
         }
     });
 
-    // user disconnected
+    // user diconnected
     socket.on('disconnect', function() {
-
+      delete onlineGamers[socket.username];
+      io.emit("users",Object.keys(onlineGamers));
     });
 
-    // user chats
-    socket.on('chat message', function(msg) {
-        console.log('message: ' + msg);
-        io.emit('chat message', msg);
+    // user default room chat
+    socket.on('chat', function(msg) {
+        io.to('default').emit("chat message",{"username":socket.username,"msg":msg});
     });
+
+    //user logout
+    socket.on('logout', function() {
+      delete onlineGamers[socket.username];
+      io.emit("users",Object.keys(onlineGamers));
+    });
+
 });
 
 http.listen(PORT, function() {

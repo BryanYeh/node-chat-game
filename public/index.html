@@ -3,14 +3,16 @@
 
 <head>
     <title>Socket.IO chat</title>
-    <link rel="stylesheet" href="css/custom.css">
+    <!-- <link rel="stylesheet" href="css/custom.css"> -->
 </head>
 
 <body>
-    <ul id="messages"></ul>
+    <ul id="users"></ul>
     <form action="">
-        <input id="m" autocomplete="off" /><button>Login</button>
+        <input id="m" autocomplete="off" /><button id="but">Login</button>
+        <input id="check" type="hidden" value="login">
     </form>
+    <ul id="messages"></ul>
 
     <script src="/modules/jquery/dist/jquery.min.js"></script>
     <script src="/modules/socket.io/node_modules/socket.io-client/socket.io.js"></script>
