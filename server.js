@@ -54,6 +54,41 @@ io.on('connection', function(socket) {
       io.emit("users",Object.keys(onlineGamers));
     });
 
+    socket.on('challenge',function(user){
+      if(user != socket.username){
+        if(onlineGamers[user]){
+           socket.broadcast.to(onlineGamers[user]).emit('challenged', {"username":socket.username,"msg":"you got challenged by: "+socket.username+"\nDo tic em?"});
+           socket.emit('chat message', {"username":socket.username,"msg":"you challenged: "+user});
+        }
+        else{
+          socket.emit("chat message",{"username":socket.username,"msg":"no such username: "+ user});
+        }
+      }
+      else{
+        socket.emit("chat message",{"username":socket.username, "msg":"Don't tac yourself dumb fool!"});
+      }
+    });
+
+    socket.on('challengeYes',function(user){
+      if(onlineGamers[user]){
+         socket.broadcast.to(onlineGamers[user]).emit('chat message', {"username":socket.username,"msg":"Your taced got accepted by: "+socket.username});
+      }
+      else{
+        // TODO: send back to socket.username user doesnt exist
+        // socket.emit("chat message",{"username":socket.username,"msg":"no such username: "+ user})
+      }
+    });
+
+    socket.on('challengeNo',function(user){
+      if(onlineGamers[user]){
+         socket.broadcast.to(onlineGamers[user]).emit('chat message', {"username":socket.username,"msg":"Your taced got declined by: "+socket.username});
+      }
+      else{
+        // TODO: send back to socket.username user doesnt exist
+        // socket.emit("chat message",{"username":socket.username,"msg":"no such username: "+ user})
+      }
+    });
+
 });
 
 http.listen(PORT, function() {

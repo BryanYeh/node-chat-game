@@ -7,11 +7,21 @@
 </head>
 
 <body>
+
     <ul id="users"></ul>
-    <form action="">
-        <input id="m" autocomplete="off" /><button id="but">Login</button>
-        <input id="check" type="hidden" value="login">
+    <form id="loginForm" action="">
+        <input id="ln" autocomplete="off" />
+        <button id="login">Login</button>
     </form>
+    <form id="message" action="">
+        <input id="ms" autocomplete="off" />
+        <button id="chat">Send</button>
+    </form>
+    <form id="challengeForm" action="">
+        <input id="te" autocomplete="off" />
+        <button id="challenge">Tac em</button>
+    </form>
+
     <ul id="messages"></ul>
 
     <script src="/modules/jquery/dist/jquery.min.js"></script>

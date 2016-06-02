@@ -1,10 +1,32 @@
 var socket = io();
 
+// submit form login
+$('#loginForm').submit(function() {
+    socket.emit("login", $('#ln').val());
+    $('#ln').val('');
+    return false;
+});
+
+// submit form challenge
+$('#challengeForm').submit(function() {
+    socket.emit("challenge", $('#te').val());
+    $('#te').val('');
+    return false;
+});
+
+// challenged
+socket.on('challenged', function(msg) {
+  if (confirm(msg.msg)) {
+    socket.emit("challengeYes",msg.username);
+  } else {
+    socket.emit("challengeNo",msg.username);
+  }
+});
 
 // submit form message
-$('form').submit(function() {
-    socket.emit($('#check').val(), $('#m').val());
-    $('#m').val('');
+$('#message').submit(function() {
+    socket.emit("chat", $('#ms').val());
+    $('#ms').val('');
     return false;
 });
 
@@ -15,9 +37,8 @@ socket.on('usernameError', function(error) {
 
 // login works
 socket.on('login successful', function(msg) {
-    $('#but').text("Send");
-    $('#check').val("chat");
     $('#messages').append($('<li>').text(msg));
+    $('#login').hide();
 });
 
 // get chat messages
