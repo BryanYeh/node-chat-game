@@ -23,6 +23,11 @@ socket.on('challenged', function(msg) {
   }
 });
 
+socket.on("disconnection", function(winner){
+  $('#messages').append($('<li>').text(winner.username + ": " + winner.msg));
+  socket.emit("toDefaultRoom");
+});
+
 // submit form message
 $('#message').submit(function() {
     socket.emit("chat", $('#ms').val());

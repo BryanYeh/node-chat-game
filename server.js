@@ -3,6 +3,7 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var ArrayList = require('arraylist');
+var uuid = require('uuid');
 var PORT = process.env.PORT || '3000';
 
 
@@ -14,7 +15,7 @@ app.get('/', function(req, res) {
 });
 
 var onlineGamers = {};
-var privateGame = new ArrayList();
+var privateGame = {};
 
 io.on('connection', function(socket) {
 
@@ -38,9 +39,22 @@ io.on('connection', function(socket) {
     });
 
     // user diconnected
+    // TODO: need to move other not disconnecting player into default room
     socket.on('disconnect', function() {
       delete onlineGamers[socket.username];
+      if(socket.currentRoom != "default"){
+        privateGame[socket.currentRoom].removeElement(socket.username);
+        socket.broadcast.to(onlineGamers[privateGame[socket.currentRoom].get(0)]).emit('disconnection',{"username":"SERVER","msg":socket.username + "disconnected and you won"});
+      }
       io.emit("users",Object.keys(onlineGamers));
+    });
+
+    socket.on("toDefaultRoom", function(){
+      delete privateGame[socket.currentRoom];
+      console.log(privateGame);
+      socket.leave("socket.currentRoom");
+      socket.join("default");
+      socket.currentRoom = "default";
     });
 
     // user default room chat
@@ -48,12 +62,13 @@ io.on('connection', function(socket) {
         io.to('default').emit("chat message",{"username":socket.username,"msg":msg});
     });
 
-    //user logout
+    // user logout, user cant log out during a game
     socket.on('logout', function() {
       delete onlineGamers[socket.username];
       io.emit("users",Object.keys(onlineGamers));
     });
 
+    // user challenges another user
     socket.on('challenge',function(user){
       if(user != socket.username){
         if(onlineGamers[user]){
@@ -69,9 +84,16 @@ io.on('connection', function(socket) {
       }
     });
 
+    // user accepts challenge
     socket.on('challengeYes',function(user){
       if(onlineGamers[user]){
-         socket.broadcast.to(onlineGamers[user]).emit('chat message', {"username":socket.username,"msg":"Your taced got accepted by: "+socket.username});
+          var room = uuid.v1();
+          socket.leave('default');
+          socket.join(room);
+          socket.currentRoom = room;
+          privateGame[room] = new ArrayList;
+          privateGame[room].add([socket.username, user]);
+         socket.broadcast.to(onlineGamers[user]).emit('chat message', {"username":socket.username,"msg":"Your taced got accepted by: "+socket.username,"room":room});
       }
       else{
         // TODO: send back to socket.username user doesnt exist
@@ -79,13 +101,10 @@ io.on('connection', function(socket) {
       }
     });
 
+    // user declines challenge
     socket.on('challengeNo',function(user){
       if(onlineGamers[user]){
          socket.broadcast.to(onlineGamers[user]).emit('chat message', {"username":socket.username,"msg":"Your taced got declined by: "+socket.username});
-      }
-      else{
-        // TODO: send back to socket.username user doesnt exist
-        // socket.emit("chat message",{"username":socket.username,"msg":"no such username: "+ user})
       }
     });
 
