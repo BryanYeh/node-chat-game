@@ -17,9 +17,12 @@ $('#challengeForm').submit(function() {
 // challenged
 socket.on('challenged', function(msg) {
   if (confirm(msg.msg)) {
+    $('#messages').append($('<li>').text("You accepted " + msg.username + "s challenge"));
     socket.emit("challengeYes",msg.username);
+
   } else {
     socket.emit("challengeNo",msg.username);
+    $('#messages').append($('<li>').text("You declined " + msg.username + "s challenge"));
   }
 });
 
@@ -58,4 +61,10 @@ socket.on('users',function(usersList){
     // TODO: attach a button with class="challenge" and value=usersList[i] and id=usersList[i]
     $('#users').append($('<li>').text(usersList[i]));
   }
+});
+
+// send user to private room
+socket.on('game time',function(msg){
+  $('#messages').append($('<li>').text(msg.username+": "+msg.msg));
+  socket.emit("private room",msg.room);
 });
