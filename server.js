@@ -4,8 +4,12 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var ArrayList = require('arraylist');
 var uuid = require('uuid');
+var TicTacToeGame = require('./game/ticTacToe');
 var PORT = process.env.PORT || '3000';
 
+var onlineGamers = {};
+var privateGame = {};
+var game = {};
 
 app.use('/', express.static(__dirname + '/public'));
 app.use('/modules/', express.static(__dirname + '/node_modules'));
@@ -14,8 +18,7 @@ app.get('/', function(req, res) {
     res.sendFile(__dirname + '/index.html');
 });
 
-var onlineGamers = {};
-var privateGame = {};
+
 
 io.on('connection', function(socket) {
 
@@ -53,7 +56,6 @@ io.on('connection', function(socket) {
 
     socket.on("toDefaultRoom", function() {
         delete privateGame[socket.currentRoom];
-        console.log(privateGame);
         socket.leave("socket.currentRoom");
         socket.join("default");
         socket.currentRoom = "default";
@@ -101,15 +103,14 @@ io.on('connection', function(socket) {
 
     // user accepts challenge
     socket.on('challengeYes', function(user) {
-        console.log(user);
         if (onlineGamers[user]) {
             var room = uuid.v1();
             socket.leave('default');
             socket.join(room);
             socket.currentRoom = room;
-            privateGame[room] = new ArrayList;
-            privateGame[room].add([socket.username, user]);
-            console.log(privateGame[room]);
+            privateGame[room] = [socket.username, user];
+            game[room] = new TicTacToeGame(room);
+            game[room].setPlayer(user,socket.username);
             socket.broadcast.to(onlineGamers[user]).emit('game time', {
                 "username": "SERVER",
                 "msg": "Your taced got accepted by: " + socket.username,
@@ -136,7 +137,7 @@ io.on('connection', function(socket) {
         socket.leave('default');
         socket.join(room);
         socket.currentRoom = room;
-        console.log(privateGame[room]);
+
     });
 
 });

@@ -1,20 +1,15 @@
 function TicTacToe(room){
   this.room = room;
   this.table = new Array(9);
-  this.players = ["",""];
+  this.players = new Array(2);
   this.turn = 0;
   this.symbol = ['O','X'];
 }
 
-TicTacToe.prototype.setPlayer = function(player){
-    if(this.players[0] != ""){
-      this.players[1] = player;
-    }
-    else {
-      this.players[0] = player;
-    }
+// Sets the players
+TicTacToe.prototype.setPlayer = function(player1,player2){
+    this.players = [player1,player2];
 }
-
 
 // Check if current move belongs to current player
 // return boolean
@@ -61,3 +56,5 @@ TicTacToe.prototype.checkForWinner = function(){
   else
       return false;
 }
+
+module.exports = TicTacToe;
