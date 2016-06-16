@@ -6,6 +6,11 @@ function TicTacToe(room){
   this.symbol = ['O','X'];
 }
 
+// return the board
+TicTacToe.prototype.printBoard = function(){
+  return this.table;
+}
+
 // Sets the players
 TicTacToe.prototype.setPlayer = function(player1,player2){
     this.players = [player1,player2];
@@ -20,19 +25,23 @@ TicTacToe.prototype.isTurn = function(player){
 // Check if position on the table is empty
 // return boolean
 TicTacToe.prototype.positionIsEmpty = function(position){
-  return table['position'] != 'O' && table['position'] != 'X';
+  return this.table[position] == undefined;
 };
+
+// Change players turn
+TicTacToe.prototype.nextPlayer = function(){
+  this.turn = this.turn == 0 ? 1 : 0;
+}
 
 // Place a mark on the table
 TicTacToe.prototype.makeMove = function(position){
   if(this.positionIsEmpty(position)){
       this.table[position] = this.symbol[this.turn];
+      this.nextPlayer();
+      return true;
   }
-}
-
-// Change players turn
-TicTacToe.prototype.nextPlayer = function(){
-  this.turn = !this.turn;
+  else
+    return false;
 }
 
 // return the winner
@@ -42,17 +51,17 @@ TicTacToe.prototype.getWinner = function(num){
 
 // checks for winner
 TicTacToe.prototype.checkForWinner = function(){
-  if(this.table[0] == this.table[1] == this.table[2] ||
-     this.table[0] == this.table[3] == this.table[6] ||
-     this.table[4] == this.table[0] == this.table[8])
-      return this.getWinner(0);
-  else if(this.table[3] == this.table[4] == this.table[5] ||
-          this.table[1] == this.table[4] == this.table[7] ||
-          this.table[4] == this.table[2] == this.table[6])
-      return this.getWinner(4);
-  else if(this.table[6] == this.table[7] == this.table[8] ||
-          this.table[2] == this.table[5] == this.table[8])
-      return this.getWinner(8);
+  if(this.table[0]==this.table[1] && this.table[0]==this.table[2] && this.table[0] != undefined ||
+     this.table[0]==this.table[3] && this.table[0]==this.table[6] && this.table[0] != undefined ||
+     this.table[0]==this.table[4] && this.table[0]==this.table[8] && this.table[0] != undefined)
+       return this.getWinner(0);
+  else if(this.table[4]==this.table[3] && this.table[4]==this.table[5] && this.table[4] != undefined ||
+          this.table[4]==this.table[1] && this.table[4]==this.table[7] && this.table[4] != undefined ||
+          this.table[4]==this.table[2] && this.table[4]==this.table[6] && this.table[4] != undefined )
+            return this.getWinner(4);
+  else if(this.table[8]==this.table[6] && this.table[8]==this.table[7] && this.table[8] != undefined ||
+          this.table[8]==this.table[2] && this.table[8]==this.table[5] && this.table[8] != undefined )
+              return this.getWinner(8);
   else
       return false;
 }

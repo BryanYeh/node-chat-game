@@ -1,5 +1,12 @@
 var socket = io();
 
+// submit game form
+$('#gameForm').submit(function() {
+    socket.emit("game move", $('#move').val());
+    $('#move').val('');
+    return false;
+});
+
 // submit form login
 $('#loginForm').submit(function() {
     socket.emit("login", $('#ln').val());
@@ -67,4 +74,13 @@ socket.on('users',function(usersList){
 socket.on('game time',function(msg){
   $('#messages').append($('<li>').text(msg.username+": "+msg.msg));
   socket.emit("private room",msg.room);
+});
+
+// print board
+socket.on('board',function(msg){
+  $('#messages').append($('<li>').text("-----------------------"              ));
+  $('#messages').append($('<li>').text(msg.board[0]+"|"+msg.board[1]+"|"+msg.board[2]));
+  $('#messages').append($('<li>').text(msg.board[3]+"|"+msg.board[4]+"|"+msg.board[5]));
+  $('#messages').append($('<li>').text(msg.board[6]+"|"+msg.board[7]+"|"+msg.board[8]));
+
 });

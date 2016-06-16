@@ -41,7 +41,6 @@ io.on('connection', function(socket) {
     });
 
     // user diconnected
-    // TODO: need to move other not disconnecting player into default room
     socket.on('disconnect', function() {
         delete onlineGamers[socket.username];
         if (socket.currentRoom != "default") {
@@ -138,6 +137,23 @@ io.on('connection', function(socket) {
         socket.join(room);
         socket.currentRoom = room;
 
+    });
+
+    // player make a move
+    socket.on("game move",function(num){
+        if(game[socket.currentRoom].isTurn(socket.username)){
+          if(game[socket.currentRoom].makeMove(num)){
+            io.to(socket.currentRoom).emit("board", {
+                "board": game[socket.currentRoom].printBoard()
+            });
+            if(game[socket.currentRoom].checkForWinner()){
+              io.to(socket.currentRoom).emit("chat message", {
+                "username": "SERVER",
+                "msg": game[socket.currentRoom].checkForWinner() + " has won the game"
+              });
+            }
+          }
+        }
     });
 
 });
