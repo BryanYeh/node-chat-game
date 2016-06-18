@@ -62,6 +62,10 @@ TicTacToe.prototype.checkForWinner = function(){
   else if(this.table[8]==this.table[6] && this.table[8]==this.table[7] && this.table[8] != undefined ||
           this.table[8]==this.table[2] && this.table[8]==this.table[5] && this.table[8] != undefined )
               return this.getWinner(8);
+  else if(this.table[0]!=undefined && this.table[1]!=undefined && this.table[2]!=undefined &&
+          this.table[3]!=undefined && this.table[4]!=undefined && this.table[5]!=undefined &&
+          this.table[6]!=undefined && this.table[7]!=undefined && this.table[8]!=undefined)
+            return "TIE";
   else
       return false;
 }

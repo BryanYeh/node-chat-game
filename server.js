@@ -26,31 +26,33 @@ io.on('connection', function(socket) {
     socket.on('login', function(username) {
         if (username.length >= 5) {
             if (onlineGamers[username]) {
-                socket.emit("usernameError", "Username (" + username + ") is already in use");
+                socket.emit("usernameError", "Nickname (" + username + ") is already in use");
             } else {
                 socket.join("default");
                 onlineGamers[username] = socket.id;
                 socket.username = username;
                 socket.currentRoom = "default";
-                socket.emit("login successful", "Your username is: " + username);
+                socket.emit("login successful", username);
                 io.emit("users", Object.keys(onlineGamers));
             }
         } else {
-            socket.emit("usernameError", "username needs at least 5 characters");
+            socket.emit("usernameError", "nickname needs at least 5 characters");
         }
     });
 
     // user diconnected
     socket.on('disconnect', function() {
-        delete onlineGamers[socket.username];
-        if (socket.currentRoom != "default") {
-            privateGame[socket.currentRoom].removeElement(socket.username);
-            socket.broadcast.to(onlineGamers[privateGame[socket.currentRoom].get(0)]).emit('disconnection', {
-                "username": "SERVER",
-                "msg": socket.username + " disconnected and you won"
-            });
+        if(socket.username != undefined){
+          delete onlineGamers[socket.username];
+          if (socket.currentRoom != "default") {
+              privateGame[socket.currentRoom].removeElement(socket.username);
+              socket.broadcast.to(onlineGamers[privateGame[socket.currentRoom].get(0)]).emit('disconnection', {
+                  "username": "SERVER",
+                  "msg": socket.username + " disconnected and you won"
+              });
+          }
+          io.emit("users", Object.keys(onlineGamers));
         }
-        io.emit("users", Object.keys(onlineGamers));
     });
 
     socket.on("toDefaultRoom", function() {
@@ -60,7 +62,7 @@ io.on('connection', function(socket) {
         socket.currentRoom = "default";
     });
 
-    // user default room chat
+    // user chats into current room
     socket.on('chat', function(msg) {
         io.to(socket.currentRoom).emit("chat message", {
             "username": socket.username,
@@ -115,9 +117,6 @@ io.on('connection', function(socket) {
                 "msg": "Your taced got accepted by: " + socket.username,
                 "room": room
             });
-        } else {
-            // TODO: send back to socket.username user doesnt exist
-            // socket.emit("chat message",{"username":socket.username,"msg":"no such username: "+ user})
         }
     });
 
@@ -147,10 +146,16 @@ io.on('connection', function(socket) {
                 "board": game[socket.currentRoom].printBoard()
             });
             if(game[socket.currentRoom].checkForWinner()){
-              io.to(socket.currentRoom).emit("chat message", {
-                "username": "SERVER",
-                "msg": game[socket.currentRoom].checkForWinner() + " has won the game"
-              });
+              if(game[socket.currentRoom].checkForWinner() != "TIE")
+                io.to(socket.currentRoom).emit("game over", {
+                  "username": "SERVER",
+                  "msg": game[socket.currentRoom].checkForWinner() + " has won the game"
+                });
+              else
+                io.to(socket.currentRoom).emit("game over", {
+                  "username": "SERVER",
+                  "msg": "It's a tie game"
+                });
             }
           }
         }
