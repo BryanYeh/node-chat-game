@@ -4,7 +4,7 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var ArrayList = require('arraylist');
 var uuid = require('uuid');
-var TicTacToeGame = require('./game/ticTacToe');
+var TicTacToeGame = require('./game/TicTacToe');
 var PORT = process.env.PORT || '3000';
 
 var onlineGamers = {};
