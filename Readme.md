@@ -1,16 +1,13 @@
-@<name> - to whisper
-/room <name> - to create private room with person
-/exit - to exit private room (returns to publicRoom)
+#Tic Tac Toe - Node Chat Game
 
+1. Ones that are logged in are in a default room
+2. Clicking on other user's name on the list will send challenge to play tic tac toe
+3. Once other user has accepted both are moved to a private room to play/chat
+4. Once game is over, both users are back to default room
 
-publicRoom = []
-    anyone in this room can recieve/send whoever is in here
-privateRooms = [{user1:id,user2:id},...]
-    only 2 people in a single privateRoom
+###Note: Sessions are not used, so multiple tabs are separated users
 
-Open page: localhost:3000
-    user gets sent into publicRoom
-    
-    
+`npm install`
+`node server.js`
 
-
+Go to `localhost:3000` in browser
